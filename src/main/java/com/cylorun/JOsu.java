@@ -26,7 +26,7 @@ public class JOsu {
     private static void runLoop() {
         JOsuFrame f = JOsuFrame.getInstance();
 
-        Beatmap loadedMap = new Beatmap(Path.of("E:\\coding\\projects\\java\\josu\\src\\main\\resources\\yomi_yori.osu"));
+        Beatmap loadedMap = new Beatmap(Path.of("E:\\coding\\projects\\java\\josu\\src\\main\\resources\\aim_map.osu"));
         BeatmapObjectData objectData = BeatmapObjectData.from(loadedMap);
 
         long lastns = System.nanoTime();

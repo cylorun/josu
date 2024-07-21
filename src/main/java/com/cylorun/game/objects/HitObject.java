@@ -2,6 +2,7 @@ package com.cylorun.game.objects;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 public class HitObject extends JComponent {
     private Point position;
@@ -10,6 +11,8 @@ public class HitObject extends JComponent {
     private HitSoundType hitSound;
     private String params;
     private String hitSample;
+
+    protected Consumer<HitResult> onDeath;
 
     // Hit object syntax: x,y,time,type,hitSound,objectParams,hitSample
 
@@ -23,7 +26,7 @@ public class HitObject extends JComponent {
         Point position = new Point(Integer.parseInt(data[0]), Integer.parseInt(data[1]));
         long time = Long.parseLong(data[2]);
         HitObjectType type = HitObjectType.fromInt(Integer.parseInt(data[3]));
-        HitSoundType hitSound = HitSoundType.fromId(Integer.parseInt(data[4]));
+//        HitSoundType hitSound = HitSoundType.fromId(Integer.parseInt(data[4]));
         HitObject obj;
         switch (type) {
             case CIRCLE -> obj = new Circle(position, Color.CYAN);
@@ -32,14 +35,14 @@ public class HitObject extends JComponent {
 
         obj.setType(type);
         obj.setTime(time);
-        obj.setHitSound(hitSound);
+        obj.setHitSound(HitSoundType.NORMAL);
         obj.setPosition(position);
 
         return obj;
     }
 
     public void waitForAppearance(long startMs) {
-        while ((System.currentTimeMillis() - startMs) < this.time) {
+        while ((System.currentTimeMillis() - startMs) < (this.time * 2)) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -54,6 +57,10 @@ public class HitObject extends JComponent {
         }
 
         throw new IllegalStateException("This is not a circle object: " + this);
+    }
+
+    public void onDeath(Consumer<HitResult> consumer) {
+        this.onDeath = consumer;
     }
 
 
@@ -172,6 +179,25 @@ public class HitObject extends JComponent {
             }
 
             throw new IllegalArgumentException("No HitSoundType with id " + id);
+        }
+
+        @Override
+        public String toString() {
+            return this.label;
+        }
+    }
+
+    public enum HitResult {
+        PERFECT("PERFECT", 300),
+        MEH("MEH",100),
+        BAD("BAD",50),
+        MISS("MISS",0);
+
+        private final String label;
+        private final int num;
+        private HitResult(String label, int num) {
+            this.label = label;
+            this.num = num;
         }
 
         @Override

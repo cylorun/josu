@@ -4,19 +4,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Circle extends HitObject {
-    private int diameter = 100;
+    private int diameter = 150;
     private Color color;
     private boolean clicked = false;
     private boolean isAlive = true;
     private int approachLevel = APPROACH_RATE_LEVELS;
     private long circleDeathTime = -1;
     private long circleClickTime = -1;
-    private JComponent parent;
-    private Runnable onRemove;
 
-    private static final int APPROACH_RATE = 5;
+    private boolean isDisplayingInfo = false;
+    private JComponent parent;
+
+    private static final int APPROACH_RATE = 20;
     private static final int APPROACH_RATE_LEVELS = 100;
 
     public Circle(Point point, Color color) {
@@ -33,7 +36,6 @@ public class Circle extends HitObject {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Circle.this.circleClickTime = System.currentTimeMillis();
                 Circle.this.onClick(e);
                 Circle.this.disappear();
 
@@ -51,14 +53,29 @@ public class Circle extends HitObject {
     }
 
     public void disappear() {
-        if (this.parent instanceof JPanel) {
-            this.parent.remove(this);
-            this.parent.revalidate();
-            this.parent.repaint();
+//        if (this.parent instanceof JPanel) {
+//            this.parent.remove(this);
+//            this.parent.revalidate();
+//            this.parent.repaint();
+//        }
+        this.isDisplayingInfo = true;
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            this.isDisplayingInfo = false;
+        }, 2, TimeUnit.SECONDS);
+        if (this.onDeath != null) {
+            this.onDeath.accept(this.getResult());
         }
     }
 
+    private HitResult getResult() {
+        if (!clicked) {
+            return HitResult.MISS;
+        }
+        return HitResult.PERFECT;
+    }
+
     private void onClick(MouseEvent e) {
+        this.circleClickTime = System.currentTimeMillis();
         this.clicked = true;
     }
 
@@ -82,10 +99,6 @@ public class Circle extends HitObject {
         }
 
         this.disappear();
-        if (this.onRemove != null) {
-            this.onRemove.run();
-        }
-
     }
 
     private int getApproachCircleDiameter() {
@@ -97,8 +110,13 @@ public class Circle extends HitObject {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        if (!this.isAlive) {
+        if (!this.isAlive && !this.isDisplayingInfo) {
+            return;
+        }
+        if (!this.isAlive || this.isDisplayingInfo) {
+            g2d.setColor(this.getResult().equals(HitResult.PERFECT) ? Color.GREEN : Color.RED);
+            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            g2d.drawString(this.getResult().toString(), this.getPosition().x, this.getPosition().y);
             return;
         }
 
