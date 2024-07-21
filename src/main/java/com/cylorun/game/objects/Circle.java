@@ -6,9 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class Circle extends HitObject {
-    private int diameter;
+    private int diameter = 100;
     private Color color;
-    public Point point;
     private boolean clicked = false;
     private boolean isAlive = true;
     private int approachLevel = APPROACH_RATE_LEVELS;
@@ -17,21 +16,19 @@ public class Circle extends HitObject {
     private JComponent parent;
     private Runnable onRemove;
 
-    private static final int APPROACH_RATE = 1;
+    private static final int APPROACH_RATE = 5;
     private static final int APPROACH_RATE_LEVELS = 100;
 
-    public Circle(int diameter, Point point, Color color) {
-        this(diameter, point, color, null);
+    public Circle(Point point, Color color) {
+        this(point, color, null);
     }
 
-    public Circle(int diameter, Point point, Color color, JComponent parent) {
-        this.diameter = diameter;
+    public Circle(Point point, Color color, JComponent parent) {
         this.color = color;
-        this.point = point;
         this.parent = parent;
-
+        this.setPosition(point);
         this.setPreferredSize(new Dimension(this.diameter + this.approachLevel, this.diameter + this.approachLevel));
-        this.setBounds(point.x - this.approachLevel / 2, point.y - this.approachLevel / 2, this.diameter + this.approachLevel, this.diameter + this.approachLevel);
+        this.setBounds(this.getPosition().x - this.approachLevel / 2, this.getPosition().y - this.approachLevel / 2, 550, 550);
 
         this.addMouseListener(new MouseAdapter() {
             @Override
@@ -106,12 +103,12 @@ public class Circle extends HitObject {
         }
 
         g2d.setColor(this.color);
-        g2d.fillOval(this.point.x, this.point.y, this.diameter, this.diameter);
+        g2d.fillOval(this.getPosition().x, this.getPosition().y, this.diameter, this.diameter);
 
         int arDiameter = this.getApproachCircleDiameter();
 
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(5));
-        g2d.drawOval(this.point.x - (this.approachLevel / 2), this.point.y - (this.approachLevel / 2), arDiameter, arDiameter);
+        g2d.drawOval(this.getPosition().x - (this.approachLevel / 2), this.getPosition().y - (this.approachLevel / 2), arDiameter, arDiameter);
     }
 }

@@ -18,13 +18,22 @@ public class HitObject extends JComponent {
     }
 
     public static HitObject fromLine(String line) throws IndexOutOfBoundsException, IllegalArgumentException, NumberFormatException {
-        HitObject obj = new HitObject();
         String[] data = line.split(","); // 5 objects, params?, hitsample
 
-        obj.setPosition(new Point(Integer.parseInt(data[0]), Integer.parseInt(data[1])));
-        obj.setTime(Long.parseLong(data[2]));
-        obj.setType(HitObjectType.fromId(Integer.parseInt(data[3])));
-        obj.setHitSound(HitSoundType.fromId(Integer.parseInt(data[4])));
+        Point position = new Point(Integer.parseInt(data[0]), Integer.parseInt(data[1]));
+        long time = Long.parseLong(data[2]);
+        HitObjectType type = HitObjectType.fromInt(Integer.parseInt(data[3]));
+        HitSoundType hitSound = HitSoundType.fromId(Integer.parseInt(data[4]));
+        HitObject obj;
+        switch (type) {
+            case CIRCLE -> obj = new Circle(position, Color.CYAN);
+            default -> obj = new HitObject();
+        }
+
+        obj.setType(type);
+        obj.setTime(time);
+        obj.setHitSound(hitSound);
+        obj.setPosition(position);
 
         return obj;
     }
@@ -40,7 +49,7 @@ public class HitObject extends JComponent {
     }
 
     public Circle getAsCircle() {
-        if (this.type.equals(HitObjectType.CIRCLE)) {
+        if (this instanceof Circle) {
             return (Circle) this;
         }
 
@@ -96,30 +105,43 @@ public class HitObject extends JComponent {
         this.hitSample = hitSample;
     }
 
+    @Override
+    public String toString() {
+        return "HitObject{" +
+                "position=" + position +
+                ", time=" + time +
+                ", type=" + type +
+                ", hitSound=" + hitSound +
+                ", params='" + params + '\'' +
+                ", hitSample='" + hitSample + '\'' +
+                '}';
+    }
+
     public enum HitObjectType {
-        CIRCLE("CIRCLE", 0),
-        SLIDER("SLIDER", 1),
-        NEW_COMBO("NEW_COMBO", 2),
-        SPINNER("SPINNER", 3),
-        NEW_COMBO_4("NEW_COMBO_4", 4),
-        NEW_COMBO_5("NEW_COMBO_5", 5),
-        NEW_COMBO_6("NEW_COMBO_6", 6);
+        CIRCLE("CIRCLE", 1 << 0),
+        SLIDER("SLIDER", 1 << 1),
+        NEW_COMBO("NEW_COMBO", 1 << 2),
+        SPINNER("SPINNER", 1 << 3),
+        NEW_COMBO_4("NEW_COMBO_4", 1 << 4),
+        NEW_COMBO_5("NEW_COMBO_5", 1 << 5),
+        NEW_COMBO_6("NEW_COMBO_6", 1 << 6),
+        MANIA_HOLD("MANIA_HOLD", 1 << 7);
 
         private String label;
-        private int value;
+        public int bitIdx;
 
-        private HitObjectType(String label, int value) {
+        private HitObjectType(String label, int bitIdx) {
             this.label = label;
-            this.value = value;
+            this.bitIdx = bitIdx;
         }
 
-        public static HitObjectType fromId(int id) {
+        public static HitObjectType fromInt(int i) {
             for (HitObjectType type : HitObjectType.values()) {
-                if (type.value == id) {
+                if ((i & type.bitIdx) != 0) {
                     return type;
                 }
             }
-            throw new IllegalArgumentException("No HitObjectType with id " + id);
+            throw new IllegalArgumentException("No HitObjectType with id " + i);
         }
 
         @Override

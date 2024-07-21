@@ -24,6 +24,7 @@ public class JOsuFrame extends JFrame {
         this.circles = new ArrayList<>();
 
         this.gamePanel = new JPanel(null);
+        this.gamePanel.setBackground(Color.RED);
         this.add(this.gamePanel, BorderLayout.CENTER);
 
 
@@ -32,11 +33,14 @@ public class JOsuFrame extends JFrame {
 
     public void addCircle(Circle circle) {
         this.gamePanel.add(circle);
-        circle.setLocation(circle.point);
+        circle.setLocation(translateOsuCoordinate(circle.getPosition().x), translateOsuCoordinate(circle.getPosition().y));
         this.circles.add(circle);
-
         this.repaint();
         this.revalidate();
+    }
+
+    public static int translateOsuCoordinate(int coord) {
+        return (int) (coord * 2);
     }
 
     public List<Circle> getCircles() {

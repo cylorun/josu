@@ -43,6 +43,7 @@ public class BeatmapObjectData extends BeatmapDataParser<BeatmapObjectData> impl
                 try {
                     instance.objects.add(HitObject.fromLine(line));
                 } catch (Exception e) {
+                    System.out.println(e);
                     System.out.println("Error processing object from: " + line);
                 }
             }

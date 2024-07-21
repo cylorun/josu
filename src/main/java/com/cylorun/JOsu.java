@@ -26,7 +26,7 @@ public class JOsu {
     private static void runLoop() {
         JOsuFrame f = JOsuFrame.getInstance();
 
-        Beatmap loadedMap = new Beatmap(Path.of("E:\\coding\\projects\\java\\josu\\src\\main\\resources\\bpm_120.osu"));
+        Beatmap loadedMap = new Beatmap(Path.of("E:\\coding\\projects\\java\\josu\\src\\main\\resources\\yomi_yori.osu"));
         BeatmapObjectData objectData = BeatmapObjectData.from(loadedMap);
 
         long lastns = System.nanoTime();
@@ -37,11 +37,11 @@ public class JOsu {
         while (true) {
             if (System.nanoTime() - lastns > 8_500_000 ) {
                 current.waitForAppearance(startTime);
-                System.out.println(current.getType());
+
                 if (current.getType().equals(HitObject.HitObjectType.CIRCLE)){
-                    System.out.println("yo");
                     f.addCircle(current.getAsCircle());
                 }
+
                 current = objectData.next();
 
 
