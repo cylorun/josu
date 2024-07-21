@@ -18,13 +18,12 @@ public class JOsuFrame extends JFrame {
     public JOsuFrame() {
         super("JOsu! v" + JOsu.VERSION);
         this.setVisible(true);
-        this.setResizable(false);
-        this.setSize(new Dimension(400, 400));
+        this.setSize(new Dimension(600, 450));
         this.setLayout(new BorderLayout());
 
         this.circles = new ArrayList<>();
 
-        this.gamePanel = new JPanel();
+        this.gamePanel = new JPanel(null);
         this.add(this.gamePanel, BorderLayout.CENTER);
 
 
@@ -33,6 +32,7 @@ public class JOsuFrame extends JFrame {
 
     public void addCircle(Circle circle) {
         this.gamePanel.add(circle);
+        circle.setLocation(circle.point);
         this.circles.add(circle);
 
         this.repaint();

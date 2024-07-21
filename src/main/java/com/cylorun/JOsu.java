@@ -1,9 +1,12 @@
 package com.cylorun;
 
+import com.cylorun.beatmap.Beatmap;
+import com.cylorun.beatmap.data.BeatmapObjectData;
 import com.cylorun.game.JOsuFrame;
 import com.cylorun.game.objects.Circle;
+import com.cylorun.game.objects.HitObject;
 
-import java.awt.*;
+import java.nio.file.Path;
 import java.util.List;
 
 public class JOsu {
@@ -11,19 +14,41 @@ public class JOsu {
 
     public static void main(String[] args) {
         JOsuFrame f = JOsuFrame.getInstance();
-        Circle c1 = new Circle(150, new Point(50, 50), Color.BLUE, f.gamePanel);
-        Circle c2 = new Circle(150, new Point(80, 50), Color.RED, f.gamePanel);
 
-        f.addCircle(c1);
-        f.addCircle(c2);
+
+
+        Thread thread = new Thread(JOsu::runLoop, "game-loop");
+        thread.start();
+
+
+    }
+
+    private static void runLoop() {
+        JOsuFrame f = JOsuFrame.getInstance();
+
+        Beatmap loadedMap = new Beatmap(Path.of("E:\\coding\\projects\\java\\josu\\src\\main\\resources\\bpm_120.osu"));
+        BeatmapObjectData objectData = BeatmapObjectData.from(loadedMap);
 
         long lastns = System.nanoTime();
+        long startTime = System.currentTimeMillis();
+
+        HitObject current = objectData.current();
+
         while (true) {
-            if (System.nanoTime() - lastns > 1_500_000_0 ) {
+            if (System.nanoTime() - lastns > 8_500_000 ) {
+                current.waitForAppearance(startTime);
+                System.out.println(current.getType());
+                if (current.getType().equals(HitObject.HitObjectType.CIRCLE)){
+                    System.out.println("yo");
+                    f.addCircle(current.getAsCircle());
+                }
+                current = objectData.next();
+
+
                 lastns = System.nanoTime();
                 List<Circle> circles = JOsuFrame.getInstance().getCircles();
-                for (Circle c : circles) {
-                    c.tick();
+                for (Circle circle : circles) {
+                    circle.tick();
                 }
             }
         }

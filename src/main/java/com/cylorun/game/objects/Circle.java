@@ -5,10 +5,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class Circle extends JComponent {
+public class Circle extends HitObject {
     private int diameter;
     private Color color;
-    private Point point;
+    public Point point;
     private boolean clicked = false;
     private boolean isAlive = true;
     private int approachLevel = APPROACH_RATE_LEVELS;

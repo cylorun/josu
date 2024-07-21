@@ -2,13 +2,9 @@ package com.cylorun.beatmap.data;
 
 import com.cylorun.beatmap.Beatmap;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.regex.Pattern;
 
-public class BeatmapMetadata extends BeatmapDataParser<BeatmapMetadata>{
+public class BeatmapMetadata extends BeatmapDataParser<BeatmapMetadata> {
     private String title;
     private String titleUnicode;
     private String artist;
@@ -22,6 +18,38 @@ public class BeatmapMetadata extends BeatmapDataParser<BeatmapMetadata>{
 
     private static String SECTION_IDENTIFIER = "[Metadata]";
 
+    public static BeatmapMetadata from(Beatmap map) {
+        return BeatmapDataParser.from(map, SECTION_IDENTIFIER, new Factory<BeatmapMetadata>() {
+            @Override
+            public BeatmapMetadata create() {
+                return new BeatmapMetadata();
+            }
+
+            @Override
+            public void parseLine(BeatmapMetadata instance, String line) {
+                try {
+                    String[] splitLine = line.split(":", 2);
+                    String fieldName = Character.toString(splitLine[0].charAt(0)).toLowerCase() + splitLine[0].strip().substring(1);
+                    String fieldValue = splitLine[1].strip();
+                    setFieldValue(instance, fieldName, fieldValue);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            private <T> void setFieldValue(BeatmapMetadata instance, String fieldName, T value) throws NoSuchFieldException, IllegalAccessException {
+                Class<?> clazz = instance.getClass();
+                Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+
+                if (field.getType().getName().equals("java.lang.Long")) {
+                    field.set(instance, Long.valueOf((String) value));
+                } else {
+                    field.set(instance, value);
+                }
+            }
+        });
+    }
 
     public String getTitle() {
         return title;
@@ -117,14 +145,5 @@ public class BeatmapMetadata extends BeatmapDataParser<BeatmapMetadata>{
                 ", beatmapId=" + beatmapID +
                 ", beatmapSetId=" + beatmapSetID +
                 '}';
-    }
-
-    @Override
-    protected String getDataSectionIdentifier() {
-        return SECTION_IDENTIFIER;
-    }
-
-    public static BeatmapMetadata from(Beatmap map) {
-        return BeatmapDataParser.from(map, BeatmapMetadata::new, SECTION_IDENTIFIER);
     }
 }
