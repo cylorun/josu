@@ -14,6 +14,8 @@ public class JOsu implements Runnable {
     private boolean running;
     private Thread thread;
     private Beatmap currentMap;
+
+    private BeatmapObjectData objectData;
     public static final String VERSION = "0.0.1";
     private final int TARGET_FPS = 60;
     private final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
@@ -87,12 +89,39 @@ public class JOsu implements Runnable {
         stop();
     }
 
-    private void update(double delta) {
+    private BeatmapObjectData getObjectData(Beatmap map) {
+        if (this.objectData == null) {
+            this.objectData = BeatmapObjectData.from(map);
+        }
 
+        return this.objectData;
+    }
+
+    private void update(double delta) {
+        BeatmapObjectData objData = this.getObjectData(this.currentMap);
+
+        if (!objData.hasNext()) {
+            System.out.println("end of map, GG");
+            this.running = false;
+            return;
+        }
+
+//        HitObject currObj = objData.current();
+//        HitObject newObj = objData.next();
+        for (HitObject obj : objectData.objects) {
+            if (obj.isCircle()) {
+                Circle c = obj.getAsCircle();
+                c.tick();
+            }
+        }
     }
 
     private void render() {
 
+    }
+
+    public Beatmap getCurrentMap() {
+        return this.currentMap;
     }
 
 }

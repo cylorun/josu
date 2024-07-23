@@ -55,81 +55,43 @@ public class BeatmapMetadata extends BeatmapDataParser<BeatmapMetadata> {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getTitleUnicode() {
         return titleUnicode;
-    }
-
-    public void setTitleUnicode(String titleUnicode) {
-        this.titleUnicode = titleUnicode;
     }
 
     public String getArtist() {
         return artist;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
     public String getArtistUnicode() {
         return artistUnicode;
-    }
-
-    public void setArtistUnicode(String artistUnicode) {
-        this.artistUnicode = artistUnicode;
     }
 
     public String getCreator() {
         return creator;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
     public String getVersion() {
         return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 
     public String getSource() {
         return source;
     }
 
-    public void setSource(String source) {
-        this.source = source;
-    }
-
     public String getTags() {
         return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
     }
 
     public Long getBeatmapID() {
         return beatmapID;
     }
 
-    public void setBeatmapID(long beatmapID) {
-        this.beatmapID = beatmapID;
-    }
 
     public Long getBeatmapSetID() {
         return beatmapSetID;
     }
 
-    public void setBeatmapSetID(long beatmapSetID) {
-        this.beatmapSetID = beatmapSetID;
-    }
 
     @Override
     public String toString() {

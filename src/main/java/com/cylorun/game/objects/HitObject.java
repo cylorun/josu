@@ -59,6 +59,10 @@ public class HitObject extends JComponent {
         throw new IllegalStateException("This is not a circle object: " + this);
     }
 
+    public boolean isCircle() {
+        return this instanceof Circle;
+    }
+
     public void onDeath(Consumer<HitResult> consumer) {
         this.onDeath = consumer;
     }
@@ -191,7 +195,8 @@ public class HitObject extends JComponent {
         PERFECT("PERFECT", 300),
         MEH("MEH",100),
         BAD("BAD",50),
-        MISS("MISS",0);
+        MISS("MISS",0),
+        NONE("NONE", -1);
 
         private final String label;
         private final int num;

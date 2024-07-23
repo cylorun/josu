@@ -4,6 +4,7 @@ import com.cylorun.beatmap.Beatmap;
 import com.cylorun.game.objects.HitObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,6 +22,13 @@ public class BeatmapObjectData extends BeatmapDataParser<BeatmapObjectData> impl
         return this.objects.get(this.currentIdx - (this.currentIdx == 0 ? 0 : 1)); // -1 cause this.next() post increments
     }
 
+
+    /***
+     * returns the circles that should be displayed now
+     ***/
+    public List<HitObject> getCurrent(long msIn) {
+        return Collections.emptyList();
+    }
     @Override
     public boolean hasNext() {
         return this.objects.size() < this.currentIdx;

@@ -1,25 +1,28 @@
 package com.cylorun.game.objects;
 
+import com.cylorun.JOsu;
+import com.cylorun.beatmap.Beatmap;
+import com.cylorun.util.ConversionUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class Circle extends HitObject {
-    private int diameter = 150;
+    private int diameter;
     private Color color;
     private boolean clicked = false;
     private boolean isAlive = true;
     private int approachLevel = APPROACH_RATE_LEVELS;
     private long circleDeathTime = -1;
     private long circleClickTime = -1;
-
+    private double approachRate;
     private boolean isDisplayingInfo = false;
     private JComponent parent;
-
-    private static final int APPROACH_RATE = 8;
     private static final int APPROACH_RATE_LEVELS = 100;
 
     public Circle(Point point, Color color) {
@@ -27,10 +30,13 @@ public class Circle extends HitObject {
     }
 
     public Circle(Point point, Color color, JComponent parent) {
-        this.color = color;
+        Beatmap currMap = JOsu.getInstance().getCurrentMap();
+        this.approachRate = currMap.getDifficultyData().getApproachRate();
+        this.diameter = ConversionUtil.getCircleRadius(currMap.getDifficultyData().getCircleSize()) * 2;
+        this.color = new Color(new Random().nextInt(0,254), new Random().nextInt(0,254), new Random().nextInt(0,254));
         this.parent = parent;
         this.setPosition(point);
-        this.setPreferredSize(new Dimension(this.diameter + this.approachLevel, this.diameter + this.approachLevel));
+        this.setPreferredSize(new Dimension(this.diameter + this.approachLevel,  this.diameter + this.approachLevel));
         this.setBounds(this.getPosition().x - this.approachLevel / 2, this.getPosition().y - this.approachLevel / 2, 550, 550);
 
         this.addMouseListener(new MouseAdapter() {
@@ -68,9 +74,14 @@ public class Circle extends HitObject {
     }
 
     private HitResult getResult() {
+        if (this.isAlive) { // circle is still alive
+            return HitResult.NONE;
+        }
+
         if (!clicked) {
             return HitResult.MISS;
         }
+
         return HitResult.PERFECT;
     }
 
@@ -81,7 +92,7 @@ public class Circle extends HitObject {
 
     private void tickApproachRate() {
         if (this.approachLevel > 0) {
-            this.approachLevel -= APPROACH_RATE;
+            this.approachLevel -= approachRate;
         } else {
             if (this.isAlive) {
                 this.circleDeathTime = System.currentTimeMillis();
@@ -102,7 +113,7 @@ public class Circle extends HitObject {
     }
 
     private int getApproachCircleDiameter() {
-        return this.approachLevel + this.diameter;
+        return this.diameter + this.approachLevel;
     }
 
     @Override
