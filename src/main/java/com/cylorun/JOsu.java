@@ -7,7 +7,6 @@ import com.cylorun.game.objects.Circle;
 import com.cylorun.game.objects.HitObject;
 
 import java.nio.file.Path;
-import java.util.List;
 
 public class JOsu implements Runnable {
 
@@ -20,6 +19,7 @@ public class JOsu implements Runnable {
     private final int TARGET_FPS = 60;
     private final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
     private static JOsu instance;
+
     public static void main(String[] args) {
         JOsu.getInstance().start();
     }
@@ -44,13 +44,13 @@ public class JOsu implements Runnable {
 
     public synchronized void start() {
         this.running = true;
-        thread.start();
+        this.thread.start();
     }
 
     public synchronized void stop() {
         this.running = false;
         try {
-            thread.join();
+            this.thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -62,7 +62,7 @@ public class JOsu implements Runnable {
         long lastFpsTime = 0;
         int fps = 0;
 
-        while (running) {
+        while (this.running) {
             long now = System.nanoTime();
             long updateLength = now - lastLoopTime;
             lastLoopTime = now;
@@ -78,15 +78,15 @@ public class JOsu implements Runnable {
                 fps = 0;
             }
 
-            update(delta);
-            render();
+            this.update(delta);
+            this.render();
 
             try {
                 Thread.sleep((lastLoopTime - System.nanoTime() + OPTIMAL_TIME) / 1000000);
             } catch (Exception e) {
             }
         }
-        stop();
+        this.stop();
     }
 
     private BeatmapObjectData getObjectData(Beatmap map) {
@@ -99,7 +99,6 @@ public class JOsu implements Runnable {
 
     private void update(double delta) {
         BeatmapObjectData objData = this.getObjectData(this.currentMap);
-
         if (!objData.hasNext()) {
             System.out.println("end of map, GG");
             this.running = false;

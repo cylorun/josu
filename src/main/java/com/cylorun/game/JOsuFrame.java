@@ -2,6 +2,7 @@ package com.cylorun.game;
 
 import com.cylorun.JOsu;
 import com.cylorun.game.objects.Circle;
+import com.cylorun.util.ConversionUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,17 +35,9 @@ public class JOsuFrame extends JFrame {
 
     public void addCircle(Circle circle) {
         this.gamePanel.add(circle);
-        circle.setLocation(translateOsuCoordinate(circle.getPosition().x), translateOsuCoordinate(circle.getPosition().y));
+        circle.setLocation(ConversionUtil.translateOsuCoordinate(circle.getPosition().x), ConversionUtil.translateOsuCoordinate(circle.getPosition().y));
         circle.onDeath((result) -> {
-//            System.out.println(result);
-//            JLabel miss = new JLabel(result.toString());
-//            miss.setLocation(circle.getLocation());
-//
-//            this.gamePanel.add(miss);
-//            this.gamePanel.revalidate();
-//            this.gamePanel.repaint();
-//            this.revalidate();
-//            this.repaint();
+
             Executors.newSingleThreadScheduledExecutor().schedule(() -> {
 //                this.gamePanel.remove(miss);
                 this.circles.remove(circle);
@@ -57,9 +50,6 @@ public class JOsuFrame extends JFrame {
         this.revalidate();
     }
 
-    public static int translateOsuCoordinate(int coord) {
-        return (int) (coord * 1.5);
-    }
 
     public List<Circle> getCircles() {
         return this.circles;

@@ -31,7 +31,7 @@ public class BeatmapObjectData extends BeatmapDataParser<BeatmapObjectData> impl
     }
     @Override
     public boolean hasNext() {
-        return this.objects.size() < this.currentIdx;
+        return this.objects.size() > this.currentIdx;
     }
 
     @Override
