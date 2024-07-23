@@ -19,7 +19,7 @@ public class Circle extends HitObject {
     private boolean isDisplayingInfo = false;
     private JComponent parent;
 
-    private static final int APPROACH_RATE = 20;
+    private static final int APPROACH_RATE = 8;
     private static final int APPROACH_RATE_LEVELS = 100;
 
     public Circle(Point point, Color color) {
