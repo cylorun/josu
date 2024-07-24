@@ -13,7 +13,7 @@ public abstract class BeatmapDataParser<T> {
     private static final Pattern DATA_SECTION_PATTERN = Pattern.compile("\\[[\\w\\s]*\\]\n");
 
     public static <T> T from(Beatmap map, String sectionIdentifier, Factory<T> factory) {
-        T instance = factory.create();
+        T instance = factory.create(map);
         try (BufferedReader reader = new BufferedReader(new FileReader(map.getDataPath().toFile()))) {
             String line;
             boolean foundSection = false;
@@ -41,7 +41,7 @@ public abstract class BeatmapDataParser<T> {
     }
 
     public interface Factory<T> {
-        T create();
+        T create(Beatmap map);
 
         void parseLine(T instance, String line);
     }

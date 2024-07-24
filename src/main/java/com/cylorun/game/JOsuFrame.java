@@ -34,6 +34,9 @@ public class JOsuFrame extends JFrame {
     }
 
     public void addCircle(Circle circle) {
+        if (this.circles.contains(circle)) {
+            return;
+        }
         this.gamePanel.add(circle);
         circle.setLocation(ConversionUtil.translateOsuCoordinate(circle.getPosition().x), ConversionUtil.translateOsuCoordinate(circle.getPosition().y));
         circle.onDeath((result) -> {

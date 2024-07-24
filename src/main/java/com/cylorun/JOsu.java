@@ -13,11 +13,11 @@ public class JOsu implements Runnable {
     private boolean running;
     private Thread thread;
     private Beatmap currentMap;
-
     private BeatmapObjectData objectData;
-    public static final String VERSION = "0.0.1";
     private final int TARGET_FPS = 60;
     private final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
+
+    public static final String VERSION = "0.0.1";
     private static JOsu instance;
 
     public static void main(String[] args) {
@@ -104,19 +104,23 @@ public class JOsu implements Runnable {
             this.running = false;
             return;
         }
-
-//        HitObject currObj = objData.current();
-//        HitObject newObj = objData.next();
-        for (HitObject obj : objectData.objects) {
+//        System.out.println(this.objectData.getCurrent(this.currentMap.getStartTimeMs()));
+        for (HitObject obj : objData.getCurrentObjects(System.currentTimeMillis() - this.currentMap.getStartTimeMs())) {
             if (obj.isCircle()) {
                 Circle c = obj.getAsCircle();
-                c.tick();
+                c.tick(this.currentMap.getStartTimeMs());
             }
         }
     }
 
     private void render() {
-
+        BeatmapObjectData objData = this.getObjectData(this.currentMap);
+        JOsuFrame f = JOsuFrame.getInstance();
+        for (HitObject obj : objData.getCurrentObjects(System.currentTimeMillis() - this.currentMap.getStartTimeMs())) {
+            if (obj.isCircle()) {
+                f.addCircle(obj.getAsCircle());
+            }
+        }
     }
 
     public Beatmap getCurrentMap() {

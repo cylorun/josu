@@ -19,7 +19,7 @@ public class BeatmapDifficultyData extends BeatmapDataParser<BeatmapDifficultyDa
     public static BeatmapDifficultyData from(Beatmap map) {
         return BeatmapDataParser.from(map, SECTION_IDENTIFIER, new Factory<BeatmapDifficultyData>() {
             @Override
-            public BeatmapDifficultyData create() {
+            public BeatmapDifficultyData create(Beatmap map) {
                 return new BeatmapDifficultyData();
             }
 

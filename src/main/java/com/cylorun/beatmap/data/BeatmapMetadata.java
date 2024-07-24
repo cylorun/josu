@@ -21,7 +21,7 @@ public class BeatmapMetadata extends BeatmapDataParser<BeatmapMetadata> {
     public static BeatmapMetadata from(Beatmap map) {
         return BeatmapDataParser.from(map, SECTION_IDENTIFIER, new Factory<BeatmapMetadata>() {
             @Override
-            public BeatmapMetadata create() {
+            public BeatmapMetadata create(Beatmap map) {
                 return new BeatmapMetadata();
             }
 

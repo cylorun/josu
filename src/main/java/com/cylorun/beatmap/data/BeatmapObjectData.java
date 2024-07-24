@@ -2,20 +2,22 @@ package com.cylorun.beatmap.data;
 
 import com.cylorun.beatmap.Beatmap;
 import com.cylorun.game.objects.HitObject;
+import com.cylorun.util.ConversionUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 public class BeatmapObjectData extends BeatmapDataParser<BeatmapObjectData> implements Iterator<HitObject> {
     public List<HitObject> objects;
     private int currentIdx = 0;
+    private Beatmap map;
 
     private static String SECTION_INDENTIFIER = "[HitObjects]";
 
-    private BeatmapObjectData() {
+    private BeatmapObjectData(Beatmap map) {
         this.objects = new ArrayList<>();
+        this.map = map;
     }
 
     public HitObject current() {
@@ -26,9 +28,13 @@ public class BeatmapObjectData extends BeatmapDataParser<BeatmapObjectData> impl
     /***
      * returns the circles that should be displayed now
      ***/
-    public List<HitObject> getCurrent(long msIn) {
-        return Collections.emptyList();
+    public List<HitObject> getCurrentObjects(long msIn) {
+        return this.objects.stream().filter(o -> {
+            System.out.println(msIn - ConversionUtil.getARms(this.map.getDifficultyData().getApproachRate()));
+            return msIn - ConversionUtil.getARms(this.map.getDifficultyData().getApproachRate()) >= o.getTime();
+        }).toList();
     }
+
     @Override
     public boolean hasNext() {
         return this.objects.size() > this.currentIdx;
@@ -42,8 +48,8 @@ public class BeatmapObjectData extends BeatmapDataParser<BeatmapObjectData> impl
     public static BeatmapObjectData from(Beatmap map) {
         return BeatmapDataParser.from(map, SECTION_INDENTIFIER, new Factory<>() {
             @Override
-            public BeatmapObjectData create() {
-                return new BeatmapObjectData();
+            public BeatmapObjectData create(Beatmap map) {
+                return new BeatmapObjectData(map);
             }
 
             @Override

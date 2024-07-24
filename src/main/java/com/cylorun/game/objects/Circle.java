@@ -23,6 +23,7 @@ public class Circle extends HitObject {
     private double approachRate;
     private boolean isDisplayingInfo = false;
     private JComponent parent;
+    private long mapMsIn = 0; // milliseconds into the map
     private static final int APPROACH_RATE_LEVELS = 100;
 
     public Circle(Point point, Color color) {
@@ -33,10 +34,10 @@ public class Circle extends HitObject {
         Beatmap currMap = JOsu.getInstance().getCurrentMap();
         this.approachRate = currMap.getDifficultyData().getApproachRate();
         this.diameter = ConversionUtil.getCircleRadius(currMap.getDifficultyData().getCircleSize()) * 2;
-        this.color = new Color(new Random().nextInt(0,254), new Random().nextInt(0,254), new Random().nextInt(0,254));
+        this.color = new Color(new Random().nextInt(0, 254), new Random().nextInt(0, 254), new Random().nextInt(0, 254));
         this.parent = parent;
         this.setPosition(point);
-        this.setPreferredSize(new Dimension(this.diameter + this.approachLevel,  this.diameter + this.approachLevel));
+        this.setPreferredSize(new Dimension(this.diameter + this.approachLevel, this.diameter + this.approachLevel));
         this.setBounds(this.getPosition().x - this.approachLevel / 2, this.getPosition().y - this.approachLevel / 2, 550, 550);
 
         this.addMouseListener(new MouseAdapter() {
@@ -50,7 +51,8 @@ public class Circle extends HitObject {
         });
     }
 
-    public void tick() {
+    public void tick(long mapMsIn) {
+        this.mapMsIn = mapMsIn;
         this.tickApproachRate();
 
         if (this.isAlive) {
@@ -113,7 +115,13 @@ public class Circle extends HitObject {
     }
 
     private int getApproachCircleDiameter() {
-        return this.diameter + this.approachLevel;
+        int totalArMs = ConversionUtil.getARms(this.approachRate);
+        long msLeft = this.getTime() - (long) totalArMs;
+        msLeft = Math.max(0, Math.min(msLeft, totalArMs));
+
+        int maxArDiameter = this.diameter * 2;
+        int arDiameter = (int) ((1 - ((double) msLeft / totalArMs)) * maxArDiameter);
+        return this.diameter + arDiameter;
     }
 
     @Override
