@@ -22,6 +22,10 @@ public class Beatmap {
         return this.startTimeMs;
     }
 
+    public void setStartTimeMs(long newMs) {
+        this.startTimeMs = newMs;
+    }
+
     public BeatmapDifficultyData getDifficultyData() {
         return difficultyData;
     }

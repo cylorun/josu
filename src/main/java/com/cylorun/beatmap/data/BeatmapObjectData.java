@@ -30,7 +30,6 @@ public class BeatmapObjectData extends BeatmapDataParser<BeatmapObjectData> impl
      ***/
     public List<HitObject> getCurrentObjects(long msIn) {
         return this.objects.stream().filter(o -> {
-            System.out.println(msIn - ConversionUtil.getARms(this.map.getDifficultyData().getApproachRate()));
             return msIn - ConversionUtil.getARms(this.map.getDifficultyData().getApproachRate()) >= o.getTime();
         }).toList();
     }

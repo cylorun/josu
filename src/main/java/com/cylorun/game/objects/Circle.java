@@ -17,14 +17,12 @@ public class Circle extends HitObject {
     private Color color;
     private boolean clicked = false;
     private boolean isAlive = true;
-    private int approachLevel = APPROACH_RATE_LEVELS;
     private long circleDeathTime = -1;
     private long circleClickTime = -1;
     private double approachRate;
     private boolean isDisplayingInfo = false;
     private JComponent parent;
     private long mapMsIn = 0; // milliseconds into the map
-    private static final int APPROACH_RATE_LEVELS = 100;
 
     public Circle(Point point, Color color) {
         this(point, color, null);
@@ -37,8 +35,8 @@ public class Circle extends HitObject {
         this.color = new Color(new Random().nextInt(0, 254), new Random().nextInt(0, 254), new Random().nextInt(0, 254));
         this.parent = parent;
         this.setPosition(point);
-        this.setPreferredSize(new Dimension(this.diameter + this.approachLevel, this.diameter + this.approachLevel));
-        this.setBounds(this.getPosition().x - this.approachLevel / 2, this.getPosition().y - this.approachLevel / 2, 550, 550);
+        this.setPreferredSize(new Dimension((int) (this.diameter * 2.5), (int) (this.diameter * 2.5)));
+        this.setBounds(this.getPosition().x - this.diameter / 2, this.getPosition().y - this.diameter / 2, 550, 550);
 
         this.addMouseListener(new MouseAdapter() {
             @Override
@@ -51,7 +49,7 @@ public class Circle extends HitObject {
         });
     }
 
-    public void tick(long mapMsIn) {
+    public synchronized void tick(long mapMsIn) {
         this.mapMsIn = mapMsIn;
         this.tickApproachRate();
 
@@ -93,13 +91,10 @@ public class Circle extends HitObject {
     }
 
     private void tickApproachRate() {
-        if (this.approachLevel > 0) {
-            this.approachLevel -= approachRate;
-        } else {
-            if (this.isAlive) {
-                this.circleDeathTime = System.currentTimeMillis();
-                this.onApproachEnd();
-            }
+        if ((this.getApproachCircleDiameter() == this.diameter) && this.isAlive) {
+            System.out.println("death");
+            this.circleDeathTime = System.currentTimeMillis();
+            this.onApproachEnd();
         }
     }
 
@@ -116,11 +111,13 @@ public class Circle extends HitObject {
 
     private int getApproachCircleDiameter() {
         int totalArMs = ConversionUtil.getARms(this.approachRate);
+        int maxArDiameter = this.diameter * 2;
+
         long msLeft = this.getTime() - (long) totalArMs;
         msLeft = Math.max(0, Math.min(msLeft, totalArMs));
 
-        int maxArDiameter = this.diameter * 2;
         int arDiameter = (int) ((1 - ((double) msLeft / totalArMs)) * maxArDiameter);
+
         return this.diameter + arDiameter;
     }
 
@@ -132,12 +129,12 @@ public class Circle extends HitObject {
         if (!this.isAlive && !this.isDisplayingInfo) {
             return;
         }
-        if (!this.isAlive || this.isDisplayingInfo) {
-            g2d.setColor(this.getResult().equals(HitResult.PERFECT) ? Color.GREEN : Color.RED);
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
-            g2d.drawString(this.getResult().toString(), this.getPosition().x, this.getPosition().y);
-            return;
-        }
+//        if (!this.isAlive || this.isDisplayingInfo) {
+//            g2d.setColor(this.getResult().equals(HitResult.PERFECT) ? Color.GREEN : Color.RED);
+//            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+//            g2d.drawString(this.getResult().toString(), this.getPosition().x, this.getPosition().y);
+//            return;
+//        }
 
         g2d.setColor(this.color);
         g2d.fillOval(this.getPosition().x, this.getPosition().y, this.diameter, this.diameter);
@@ -146,6 +143,6 @@ public class Circle extends HitObject {
 
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(5));
-        g2d.drawOval(this.getPosition().x - (this.approachLevel / 2), this.getPosition().y - (this.approachLevel / 2), arDiameter, arDiameter);
+        g2d.drawOval(this.getPosition().x, this.getPosition().y, arDiameter, arDiameter);
     }
 }

@@ -92,11 +92,15 @@ public class JOsu implements Runnable {
     private BeatmapObjectData getObjectData(Beatmap map) {
         if (this.objectData == null) {
             this.objectData = BeatmapObjectData.from(map);
+            this.currentMap.setStartTimeMs(System.currentTimeMillis());
         }
 
         return this.objectData;
     }
 
+    private long getMsIntoMap() {
+        return System.currentTimeMillis() - this.currentMap.getStartTimeMs();
+    }
     private void update(double delta) {
         BeatmapObjectData objData = this.getObjectData(this.currentMap);
         if (!objData.hasNext()) {
@@ -104,11 +108,11 @@ public class JOsu implements Runnable {
             this.running = false;
             return;
         }
-//        System.out.println(this.objectData.getCurrent(this.currentMap.getStartTimeMs()));
-        for (HitObject obj : objData.getCurrentObjects(System.currentTimeMillis() - this.currentMap.getStartTimeMs())) {
+
+        for (HitObject obj : objData.getCurrentObjects(this.getMsIntoMap())) {
             if (obj.isCircle()) {
                 Circle c = obj.getAsCircle();
-                c.tick(this.currentMap.getStartTimeMs());
+                c.tick(this.getMsIntoMap());
             }
         }
     }
@@ -116,7 +120,7 @@ public class JOsu implements Runnable {
     private void render() {
         BeatmapObjectData objData = this.getObjectData(this.currentMap);
         JOsuFrame f = JOsuFrame.getInstance();
-        for (HitObject obj : objData.getCurrentObjects(System.currentTimeMillis() - this.currentMap.getStartTimeMs())) {
+        for (HitObject obj : objData.getCurrentObjects(this.getMsIntoMap())) {
             if (obj.isCircle()) {
                 f.addCircle(obj.getAsCircle());
             }
